@@ -47,8 +47,10 @@ int main(int argc, char* argv[]){
 
     ifstream input(inputFile);
     if(!input){
-        inputFile += ".srt";
-        input.open(inputFile);
+        if(inputFile.size() < 4 || inputFile.substr(inputFile.size() - 4) != ".srt") {
+            inputFile += ".srt";
+            input.open(inputFile);
+        }
         if (!input) {
             cerr << "Error: Cannot open file '" << inputFile << "'\n";
             return 1;

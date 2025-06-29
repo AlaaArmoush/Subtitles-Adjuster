@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
     }
 
     string inputFile, shiftStr;
+
     for(int i = 0; i < argc; i++){
         if(argv[i] == "-i"){
             inputFile = argv[i+1];
@@ -33,8 +34,49 @@ int main(int argc, char* argv[]){
 
     int shiftMs = parseShift(shiftStr);
 
-    
+    ifstream input(inputFile);
+    if(!input){
+        inputFile += ".srt";
+        input.open(inputFile);
+        if (!input) {
+            cerr << "Error: Cannot open file '" << inputFile << "'\n";
+            return 1;
+        }
+    }
 
+    string outputFile;
+    size_t dotPos = inputFile.rfind('.');
+    if(dotPos == string::npos){
+        outputFile = inputFile + "_adjusted.srt";
+    } else{
+        outputFile = inputFile.substr(0, dotPos) + "_adjusted.srt"; 
+    }
+    ofstream output(outputFile);
+
+    cout << "Shifting subtitles by " << shiftStr << ".....\n";
+    string line;
+    int i = 1;
+    while(getline(input, line)){
+        if(regex_match(line, regex("[0-9]+"))){
+            output << i++ << "\n";
+        }else if(line.find("-->") != string::npos){
+            size_t arrowPos = line.find(" --> "); 
+            string start = line.substr(0, arrowPos);
+            string end = line.substr(arrowPos + 5);
+
+            int startMs = timeToMs(start) + shiftMs;
+            int endMs = timeToMs(end) + shiftMs;
+            
+            output << msToTimeStr(startMs) << " --> " << msToTimeStr(endMs) << "\n";
+        } else {
+            output << line << "\n";
+        }
+    }
+
+    input.close();
+    output.close();
+
+    cout << "Subtitles shifted, and saved to: " << outputFile << "\n";
     return 0;
 }
 

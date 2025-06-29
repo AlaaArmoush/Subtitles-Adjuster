@@ -20,14 +20,25 @@ int main(int argc, char* argv[]){
     string inputFile, shiftStr;
 
     for(int i = 1; i < argc; i++){
-        if(argv[i] == "-i"){
-            inputFile = argv[i+1];
+        string arg = argv[i];  
+        if(arg == "-i"){
+            if(i + 1 < argc){
+                inputFile = argv[++i];
+            } else {
+                cerr << "-i requires a filename\n";
+                return 1;
+            }
         }
-        else if(argv[i] == "-s"){
-            shiftStr = argv[i + 1];
+        else if(arg == "-s"){
+            if(i + 1 < argc){
+                shiftStr = argv[++i];
+            } else {
+                cerr << "-s requires a shift value\n";
+                return 1;
+            }
         }
         else{
-            cerr << "Unknown argument: " << argv[i] << "\n";
+            cerr << "Unknown argument: " << arg << "\n";
             return 1;
         }
     }
